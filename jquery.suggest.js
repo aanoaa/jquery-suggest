@@ -20,7 +20,11 @@
     var enter = 13;
     var tab = 9
     var esc = 27;
-    $.fn.suggest = function(words){
+    $.fn.suggest = function(words, options){
+        var settings = $.extend({
+            onComplete: undefined
+        }, options || {});
+
         $(document).click(function(){
             box.hide();
         });
@@ -145,6 +149,10 @@
                     input.val(
                         box.hide().find('li').eq(selection).data('text')
                     );
+                    if (settings.onComplete !== undefined) {
+                        settings.onComplete(box.hide().find('li').eq(selection).data('text'));
+                    }
+                    return false;
                 }
                 else if(event.keyCode == tab || event.keyCode == esc){
                     hide();
