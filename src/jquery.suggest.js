@@ -9,7 +9,8 @@
     $.extend($.suggest, {
         globals: {
             selection: null,
-            length: 0
+            length: 0,
+            active: false
         },
         settings: {
             afterSelected: undefined,
@@ -30,14 +31,6 @@
                 cursor: 'pointer'
             },
             suggestBoxHtml: '<ul id="suggest"></ul>',
-            suggestBoxItemCss: {
-                paddingleft: 0,
-                paddingRight: 0,
-                margin: 0,
-                paddingLeft: '5px',
-                paddingRight: '5px',
-                cursor: 'pointer'
-            },
             suggestBoxCss: {
                 position            : 'absolute',
                 backgroundColor     : 'white',
@@ -51,6 +44,14 @@
                 color               : '#555',
                 textAlign           : 'left',
                 display             : 'none'
+            },
+            suggestBoxItemCss: {
+                paddingleft: 0,
+                paddingRight: 0,
+                margin: 0,
+                paddingLeft: '5px',
+                paddingRight: '5px',
+                cursor: 'pointer'
             }
         },
         loading: function(input, data) {
@@ -95,7 +96,41 @@
                         $.suggest.hide();
                     }
                 }
-                // ---------------------------------------
+
+                console.log('selection: ' + $.suggest.globals.selection);
+                console.log('length: ' + $.suggest.globals.length);
+
+                if ($.suggest.globals.active) {
+                    if ($.suggest.settings.keys.ARROW_UP == e.keyCode || $.suggest.settings.keys.ARROW_DOWN == e.keyCode) {
+                        if ($.suggest.globals.selection == null) {
+                            $.suggest.globals.selection = e.keyCode == $.suggest.settings.keys.ARROW_DOWN ? 0 : $.suggest.globals.length - 1;
+                        } else {
+                            $.suggest.globals.selection += e.keyCode == $.suggest.settings.keys.ARROW_DOWN ? 1 : -1;
+                            if ($.suggest.globals.selection < 0) {
+                                $.suggest.globals.selection = $.suggest.globals.length - 1;
+                            } else if ($.suggest.globals.selection >= $.suggest.globals.length) {
+                                $.suggest.globals.selection = 0;
+                            }
+                        }
+
+                        var text = $('#suggest > li')
+                            .css('background-color', 'transparent')
+                            .eq($.suggest.globals.selection)
+                            .css('background-color', 'LightBlue')
+                            .text();
+                        input.val(text);
+                        return false;
+                    } else if ($.suggest.settings.keys.ENTER == e.keyCode) {
+                        var selected = $('#suggest').hide().find('li').eq($.suggest.globals.selection).text();
+                        input.val(selected);
+                        if ($.suggest.settings.afterSelected !== undefined) {
+                            $.suggest.settings.onComplete(selected);
+                        }
+                        return false;
+                    } else if ($.suggest.settings.keys.TAB == e.keyCode || $.suggest.settings.keys.ESC == e.keyCode) {
+                        $.suggest.hide();
+                    }
+                }
                 return true;
             });
         },
@@ -105,9 +140,11 @@
                 top: offset.top + input.height() + 7,
                 left: offset.left
             }).fadeIn();
+            $.suggest.globals.active = true;
         },
         hide: function() {
             $('#suggest').fadeOut();
+            $.suggest.globals.active = false;
         },
         destroy: function() {
             $(document).unbind('keydown.suggest');
