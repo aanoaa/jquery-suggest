@@ -93,7 +93,7 @@
         if ($.suggest.settings.inited) return true;
         else $.suggest.settings.inited = true;
 
-        $.suggest.input = input;
+        $.suggest.input = input.attr('autocomplete', 'off');
         $.suggest.data = data;
         if (settings) $.extend($.suggest.settings, settings);
         $('body').append($($.suggest.settings.html).css($.suggest.settings.css));
