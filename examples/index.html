@@ -8,7 +8,15 @@
     <script type="text/javascript" src="../src/jquery.suggest.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('input[title*=suggest]').suggest(['foo', 'bar', 'baz']);
+            $('input[title*=suggest]').suggest(['용사장', '용사원', '용사잠', '키이사', '키이디', '이차장', '홍사원', '이인턴', '이박사']);
+            $(document).bind('beforeReveal.suggest', function(e, text) {
+                console.log('beforeReveal');
+                if (text) console.log(text);
+            });
+            $(document).bind('afterComplete.suggest', function(e, text) {
+                console.log('afterComplete');
+                if (text) console.log(text);
+            });
         });
     </script>
 </head>

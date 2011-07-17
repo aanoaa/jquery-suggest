@@ -1,176 +1,179 @@
 /*
+    TODO: better docs.. english wtf..
     $('input[title*=suggest]').suggest(['foo', 'bar', 'baz']);
+    $(document).bind('afterComplete.suggest', function(e, text) {
+        console.log('afterComplete');
+        if (text) console.log(text);
+    });
 */
 (function($) {
-    $.suggest = function() {
-        $.suggest.loading();
-    };
-
-    $.extend($.suggest, {
-        globals: {
-            selection: null,
-            length: 0,
-            active: false
-        },
+    $.extend($.suggest = {}, {
+        input: undefined,
+        data: [],
+        selected: null,
         settings: {
-            afterSelected: undefined,
-            key: [ 38, 40, 13, 9, 27 ], // shotcut wtf..
-            keys: {
-                ARROW_UP    : 38,
-                ARROW_DOWN  : 40,
-                ENTER       : 13,
-                TAB         : 9,
-                ESC         : 27
-            },
+            html: '<ul id="suggest"></ul>',
             css: {
-                paddingleft: 0,
-                paddingRight: 0,
-                margin: 0,
-                paddingLeft: '5px',
-                paddingRight: '5px',
-                cursor: 'pointer'
+                position        : 'absolute',
+                backgroundColor : 'white',
+                border          : '1px solid #999',
+                paddingLeft     : '0px',
+                paddingRight    : '0px',
+                margin          : 0,
+                paddingTop      : '3px',
+                paddingBottom   : '3px',
+                listStyleType   : 'none',
+                color           : '#555',
+                textAlign       : 'left',
+                display         : 'none'
             },
-            suggestBoxHtml: '<ul id="suggest"></ul>',
-            suggestBoxCss: {
-                position            : 'absolute',
-                backgroundColor     : 'white',
-                border              : '1px solid #999',
-                paddingLeft         : '0px',
-                paddingRight        : '0px',
+            itemCss: {
+                paddingleft         : 0,
+                paddingRight        : 0,
                 margin              : 0,
-                paddingTop          : '3px',
-                paddingBottom       : '3px',
-                listStyleType       : 'none',
-                color               : '#555',
-                textAlign           : 'left',
-                display             : 'none'
-            },
-            suggestBoxItemCss: {
-                paddingleft: 0,
-                paddingRight: 0,
-                margin: 0,
-                paddingLeft: '5px',
-                paddingRight: '5px',
-                cursor: 'pointer'
+                paddingLeft         : '5px',
+                paddingRight        : '5px',
+                cursor              : 'pointer'
             }
         },
-        loading: function(input, data) {
-            $(document).bind('keydown.suggest', function(e) {
-                //console.log(e); // debug
-                var matched = $.grep($.suggest.settings.key, function(n, i) {
-                    return e.keyCode == n;
-                });
-
-                if (!matched.length > 0) {
-                    var value = input.val();
-                    console.log(value);
-                    var to_complete = value.split(' ').pop().toLowerCase();
-                    if (to_complete) {
-                        var suggestions = $.grep(data, function(word, i){
-                            return word.toLowerCase().indexOf(to_complete.toLowerCase()) == 0
-                        });
-                        if(suggestions.length){
-                            $.suggest.globals.selection = null;
-                            $.suggest.globals.length = suggestions.length;
-                            $.suggest.show(input);
-                            $('#suggest').empty(); // clear selections
-                            $.each(suggestions, function(i, suggestion) {
-                                var postfix = suggestion.slice(to_complete.length, suggestion.length);
-                                var text = value + postfix;
-                                $('<li>' + value + '<em style="color: black">' + postfix + '</em>' + '</li>')
-                                    .css($.suggest.settings.suggestBoxItemCss)
-                                    .hover(function() {
-                                        $(this).css('background-color', 'LightBlue');
-                                    }, function() {
-                                        $(this).css('background-color', 'transparent');
-                                    })
-                                    .click(function() {
-                                        $.suggest.hide();
-                                        input.val(text).focus();
-                                    }).appendTo('#suggest');
-                            });
-                        } else {
-                            $.suggest.hide();
-                        }
-                    } else {
-                        $.suggest.hide();
-                    }
-                }
-
-                console.log('selection: ' + $.suggest.globals.selection);
-                console.log('length: ' + $.suggest.globals.length);
-
-                if ($.suggest.globals.active) {
-                    if ($.suggest.settings.keys.ARROW_UP == e.keyCode || $.suggest.settings.keys.ARROW_DOWN == e.keyCode) {
-                        if ($.suggest.globals.selection == null) {
-                            $.suggest.globals.selection = e.keyCode == $.suggest.settings.keys.ARROW_DOWN ? 0 : $.suggest.globals.length - 1;
-                        } else {
-                            $.suggest.globals.selection += e.keyCode == $.suggest.settings.keys.ARROW_DOWN ? 1 : -1;
-                            if ($.suggest.globals.selection < 0) {
-                                $.suggest.globals.selection = $.suggest.globals.length - 1;
-                            } else if ($.suggest.globals.selection >= $.suggest.globals.length) {
-                                $.suggest.globals.selection = 0;
-                            }
-                        }
-
-                        var text = $('#suggest > li')
-                            .css('background-color', 'transparent')
-                            .eq($.suggest.globals.selection)
-                            .css('background-color', 'LightBlue')
-                            .text();
-                        input.val(text);
-                        return false;
-                    } else if ($.suggest.settings.keys.ENTER == e.keyCode) {
-                        var selected = $('#suggest').hide().find('li').eq($.suggest.globals.selection).text();
-                        input.val(selected);
-                        if ($.suggest.settings.afterSelected !== undefined) {
-                            $.suggest.settings.onComplete(selected);
-                        }
-                        return false;
-                    } else if ($.suggest.settings.keys.TAB == e.keyCode || $.suggest.settings.keys.ESC == e.keyCode) {
-                        $.suggest.hide();
-                    }
-                }
-                return true;
+        loading: function(input) {
+            init();
+            $(document).bind('keyup.suggest', keyupHandler);
+            $(document).trigger('loading.suggest');
+        },
+        reveal: function(words, latest, value) {
+            $(document).trigger('beforeReveal.suggest');
+            $('#suggest').empty();
+            $.each(words, function(i, word) {
+                var postfix = word.slice(latest.length, word.length);
+                var text = value + postfix;
+                $('<li>' + value + '<em style="color: black; font-style: normal; font-weight: bold;">' + postfix + '</em></li>')
+                    .css($.suggest.settings.itemCss)
+                    .hover(function() {
+                        $(this).css('background-color', 'LightBlue');
+                    }, function() {
+                        $(this).css('background-color', 'transparent');
+                    })
+                    .click(function() {
+                        $.suggest.input.val(text).focus();
+                    }).appendTo('#suggest');
             });
+            show();
         },
-        show: function(input) {
-            var offset = input.offset();
-            $('#suggest').css({
-                top: offset.top + input.height() + 7,
-                left: offset.left
-            }).fadeIn();
-            $.suggest.globals.active = true;
+        unreveal: function() {
+            hide();
         },
-        hide: function() {
-            $('#suggest').fadeOut();
-            $.suggest.globals.active = false;
-        },
-        destroy: function() {
-            $(document).unbind('keydown.suggest');
-        },
+        close: function() {
+           $(document).trigger('close.suggest');
+           return false;
+        }
     });
 
-    // public $.fn methods
     $.fn.suggest = function(data, settings) {
         if ($(this).length == 0) return;
-        if (data === undefined) return;
+        if (data === undefined || data.length == 0) return;
 
-        init(settings);
-        $(this).focus(function() { $.suggest.loading($(this), data) });
-        $(this).focusout(function() { $.suggest.destroy() });
+        init($(this), data, settings);
 
-        return this;
+        function focusHandler() {
+            $.suggest.loading($(this));
+            return false;
+        }
+
+        function focusoutHandler() {
+            $(document).trigger('close.suggest');
+            return false;
+        }
+
+        return this.bind('focus.suggest', focusHandler)
+            .bind('focusout.suggest', focusoutHandler);
     }
 
-    // private methods
-    function init(settings) {
+    function init(input, data, settings) {
         if ($.suggest.settings.inited) return true;
         else $.suggest.settings.inited = true;
+
+        $.suggest.input = input;
+        $.suggest.data = data;
         if (settings) $.extend($.suggest.settings, settings);
-        console.log($.suggest.settings.suggestBoxHtml);
-        $('body').append( 
-            $($.suggest.settings.suggestBoxHtml).css($.suggest.settings.suggestBoxCss)
-        );
+        $('body').append($($.suggest.settings.html).css($.suggest.settings.css));
     }
+
+    function keyupHandler(e) {
+        if (e.keyCode == 27) {
+            $.suggest.unreveal();
+            return false; // true or false which is correct?
+        }
+
+        var value = $.suggest.input.val();
+        var latest = value.split(' ').pop().toLowerCase();
+        if (latest) {
+            var words = $.grep($.suggest.data, function(word, i) {
+                return word.toLowerCase().indexOf(latest) == 0;
+            });
+
+            if (words.length > 0) {
+                $.suggest.reveal(words, latest, value);
+
+                var size = $('#suggest > li').length;
+                if (38 == e.keyCode || 40 == e.keyCode) {
+                    if ($.suggest.selected == null) {
+                        $.suggest.selected = 0;
+                    } else {
+                        $.suggest.selected += e.keyCode == 40 ? 1 : -1;
+                    }
+
+                    if ($.suggest.selected < 0) {
+                        $.suggest.selected = size - 1;
+                    } else if ($.suggest.selected >= size) {
+                        $.suggest.selected = 0;
+                    }
+
+                    $('#suggest > li')
+                        .css('background-color', 'transparent')
+                        .eq($.suggest.selected)
+                        .css('background-color', 'LightBlue');
+                    return false;
+                } else if (13 == e.keyCode) {
+                    var text = $('#suggest li').eq($.suggest.selected).text();
+                    $.suggest.input.val(text);
+                    $(document).trigger('afterComplete.suggest', text);
+                    hide();
+                    return false;
+                } else if (9 == e.keyCode) {
+                    hide();
+                }
+            } else {
+                hide();
+            }
+        } else {
+            hide();
+        }
+
+        return true;
+    }
+
+    function show() {
+        var offset = $.suggest.input.offset();
+        $('#suggest').css({
+            top: offset.top + $.suggest.input.height() + 7,
+            left: offset.left
+        }).show();
+    }
+
+    function hide() {
+        $.suggest.selected = null;
+        $('#suggest').fadeOut(function() {
+            $(this).empty();
+        });
+    }
+
+    // bindings
+    $(document).bind('close.suggest', function() {
+        $(document).unbind('keyup.suggest');
+        $('#suggest').fadeOut(function() {
+            $(this).empty();
+            $(document).trigger('afterClose.suggest');
+        });
+    });
 })(jQuery);
