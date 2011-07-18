@@ -32,7 +32,8 @@
                 listStyleType   : 'none',
                 color           : '#555',
                 textAlign       : 'left',
-                display         : 'none'
+                display         : 'none',
+                'z-index'       : 9999,
             },
             itemCss: {
                 paddingleft         : 0,
