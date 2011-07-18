@@ -8,7 +8,6 @@
 */
 (function($) {
     $.extend($.suggest = {}, {
-        input: undefined,
         data: [],
         selected: null,
         settings: {
@@ -38,10 +37,10 @@
         },
         loading: function(input) {
             init();
-            $(document).bind('keyup.suggest', keyupHandler);
+            $(document).bind('keyup.suggest', { msg: input }, keyupHandler);
             $(document).trigger('loading.suggest');
         },
-        reveal: function(words, latest, value) {
+        reveal: function(input, words, latest, value) {
             $(document).trigger('beforeReveal.suggest');
             $('#suggest').empty();
             $.each(words, function(i, word) {
@@ -55,10 +54,10 @@
                         $(this).css('background-color', 'transparent');
                     })
                     .click(function() {
-                        $.suggest.input.val(text).focus();
+                        input.val(text).focus();
                     }).appendTo('#suggest');
             });
-            show();
+            show(input);
         },
         unreveal: function() {
             hide();
@@ -93,19 +92,20 @@
         if ($.suggest.settings.inited) return true;
         else $.suggest.settings.inited = true;
 
-        $.suggest.input = input.attr('autocomplete', 'off');
+        input.attr('autocomplete', 'off');
         $.suggest.data = data;
         if (settings) $.extend($.suggest.settings, settings);
         $('body').append($($.suggest.settings.html).css($.suggest.settings.css));
     }
 
     function keyupHandler(e) {
+        var input = e.data.msg;
         if (e.keyCode == 27) {
             $.suggest.unreveal();
             return false; // true or false which is correct?
         }
 
-        var value = $.suggest.input.val();
+        var value = input.val();
         var latest = value.split(' ').pop().toLowerCase();
         if (latest) {
             var words = $.grep($.suggest.data, function(word, i) {
@@ -113,7 +113,7 @@
             });
 
             if (words.length > 0) {
-                $.suggest.reveal(words, latest, value);
+                $.suggest.reveal(input, words, latest, value);
 
                 var size = $('#suggest > li').length;
                 if (38 == e.keyCode || 40 == e.keyCode) {
@@ -136,7 +136,7 @@
                     return false;
                 } else if (13 == e.keyCode) {
                     var text = $('#suggest li').eq($.suggest.selected).text();
-                    $.suggest.input.val(text);
+                    input.val(text);
                     $(document).trigger('afterComplete.suggest', text);
                     hide();
                     return false;
@@ -153,10 +153,10 @@
         return true;
     }
 
-    function show() {
-        var offset = $.suggest.input.offset();
+    function show(input) {
+        var offset = input.offset();
         $('#suggest').css({
-            top: offset.top + $.suggest.input.height() + 7,
+            top: offset.top + input.height() + 7,
             left: offset.left
         }).show();
     }

@@ -13,6 +13,7 @@
                 console.log('beforeReveal');
                 if (text) console.log(text);
             });
+
             $(document).bind('afterComplete.suggest', function(e, text) {
                 console.log('afterComplete');
                 if (text) console.log(text);
