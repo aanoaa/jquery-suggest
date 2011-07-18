@@ -78,7 +78,7 @@
 
     $.fn.suggest = function(data, settings) {
         if ($(this).length == 0) return;
-        if (data === undefined || data.length == 0) return;
+        if ($.suggest.data.length == 0 && data === undefined || data.length == 0) return;
 
         init($(this), data, settings);
 
