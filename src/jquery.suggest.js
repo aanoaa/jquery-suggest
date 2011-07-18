@@ -46,6 +46,7 @@
         },
         loading: function(input) {
             init();
+            input.attr('autocomplete', 'off');
             $(document).bind('keyup.suggest', { msg: input }, keyupHandler);
             $(document).trigger('loading.suggest');
         },
@@ -100,7 +101,6 @@
         if ($.suggest.settings.inited) return true;
         else $.suggest.settings.inited = true;
 
-        input.attr('autocomplete', 'off');
         if (data) $.suggest.data = data;
         if (settings) $.extend($.suggest.settings, settings);
         $('body').append($($.suggest.settings.html).css($.suggest.settings.css));
