@@ -78,7 +78,6 @@
 
     $.fn.suggest = function(data, settings) {
         if ($(this).length == 0) return;
-        if ($.suggest.data.length == 0 && data === undefined || data.length == 0) return;
 
         init($(this), data, settings);
 
@@ -101,7 +100,7 @@
         else $.suggest.settings.inited = true;
 
         input.attr('autocomplete', 'off');
-        $.suggest.data = data;
+        if (data) $.suggest.data = data;
         if (settings) $.extend($.suggest.settings, settings);
         $('body').append($($.suggest.settings.html).css($.suggest.settings.css));
     }

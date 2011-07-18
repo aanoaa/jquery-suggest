@@ -8,7 +8,11 @@
     <script type="text/javascript" src="../src/jquery.suggest.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('input[title*=suggest]').suggest(['용사장', '용사원', '용사잠', '키이사', '키이디', '이차장', '홍사원', '이인턴', '이박사']);
+            $.suggest.data = ['용사장', '용사원', '용사잠', '키이사', '키이디', '이차장', '홍사원', '이인턴', '이박사'];
+            $('input[title*=suggest]').suggest();
+            // or
+            // $('input[title*=suggest]').suggest(['용사장', '용사원', '용사잠', '키이사', '키이디', '이차장', '홍사원', '이인턴', '이박사']);
+
             $(document).bind('beforeReveal.suggest', function() {
                 console.log('beforeReveal');
             });
