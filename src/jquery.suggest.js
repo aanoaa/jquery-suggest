@@ -5,6 +5,14 @@
         console.log('afterComplete');
         if (text) console.log(text);
     });
+
+    available callback list is below
+
+    * loading.suggest
+    * beforeReveal.suggest
+    * close.suggest
+    * afterComplete.suggest - arg 'word'
+    * afterClose.suggest
 */
 (function($) {
     $.extend($.suggest = {}, {
