@@ -48,6 +48,7 @@
             init();
             input.attr('autocomplete', 'off');
             $(document).bind('keyup.suggest', { msg: input }, keyupHandler);
+            $(document).bind('keydown.suggest', keydownHandler);
             $(document).trigger('loading.suggest');
         },
         reveal: function(input, words, latest, value) {
@@ -165,6 +166,10 @@
         return true;
     }
 
+    function keydownHandler(e) {
+        e.preventDefault();
+    }
+
     function show(input) {
         var offset = input.offset();
         $('#suggest').css({
@@ -183,6 +188,7 @@
     // bindings
     $(document).bind('close.suggest', function() {
         $(document).unbind('keyup.suggest');
+        $(document).unbind('keydown.suggest');
         $('#suggest').fadeOut(function() {
             $(this).empty();
             $(document).trigger('afterClose.suggest');
