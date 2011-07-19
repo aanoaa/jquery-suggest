@@ -64,8 +64,10 @@
                         $(this).css('background-color', 'transparent');
                     })
                     .click(function() {
-                        input.val(text).focus();
+                        input.val(text);
                         $(document).trigger('afterComplete.suggest', text);
+                        $(document).trigger('close.suggest');
+                        input.focus();
                     }).appendTo('#suggest');
             });
             show(input);
@@ -147,7 +149,8 @@
                     var text = $('#suggest li').eq($.suggest.selected).text();
                     input.val(text);
                     $(document).trigger('afterComplete.suggest', text);
-                    hide();
+                    $(document).trigger('close.suggest');
+                    input.focus();
                     return false;
                 } else if (9 == e.keyCode) {
                     hide();
