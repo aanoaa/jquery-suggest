@@ -167,7 +167,7 @@
     }
 
     function keydownHandler(e) {
-        e.preventDefault();
+        if (e.keyCode == 13) e.preventDefault();
     }
 
     function show(input) {
