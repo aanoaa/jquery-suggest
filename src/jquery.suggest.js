@@ -65,6 +65,7 @@
                     })
                     .click(function() {
                         input.val(text).focus();
+                        $(document).trigger('afterComplete.suggest', text);
                     }).appendTo('#suggest');
             });
             show(input);
