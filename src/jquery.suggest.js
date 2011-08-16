@@ -85,7 +85,7 @@
     $.fn.suggest = function(data, settings) {
         if ($(this).length == 0) return;
 
-        init($(this), data, settings);
+        init($(this), settings);
 
         function focusHandler() {
             $.suggest.loading($(this), data);
@@ -101,17 +101,17 @@
             .bind('focusout.suggest', focusoutHandler);
     }
 
-    function init(input, data, settings) {
+    function init(input, settings) {
         if ($.suggest.settings.inited) return true;
         else $.suggest.settings.inited = true;
 
-        if (data) $.suggest.data = data;
         if (settings) $.extend($.suggest.settings, settings);
         $('body').append($($.suggest.settings.html).css($.suggest.settings.css));
     }
 
     function keyupHandler(e) {
         var input = e.data.msg[0];
+        var data = e.data.msg[1];
         if (e.keyCode == 27) {
             $.suggest.unreveal();
             return false; // true or false which is correct?
@@ -120,7 +120,7 @@
         var value = input.val();
         var latest = value.split(' ').pop().toLowerCase();
         if (latest) {
-            var words = $.grep($.suggest.data, function(word, i) {
+            var words = $.grep(data, function(word, i) {
                 return word.toLowerCase().indexOf(latest) == 0;
             });
 
