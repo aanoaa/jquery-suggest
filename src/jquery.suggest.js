@@ -44,10 +44,10 @@
                 cursor              : 'pointer'
             }
         },
-        loading: function(input) {
+        loading: function(input, data) {
             init();
             input.attr('autocomplete', 'off');
-            $(document).bind('keyup.suggest', { msg: input }, keyupHandler);
+            $(document).bind('keyup.suggest', { msg: [input, data] }, keyupHandler);
             $(document).bind('keydown.suggest', keydownHandler);
             $(document).trigger('loading.suggest');
         },
@@ -88,7 +88,7 @@
         init($(this), data, settings);
 
         function focusHandler() {
-            $.suggest.loading($(this));
+            $.suggest.loading($(this), data);
             return false;
         }
 
@@ -111,7 +111,7 @@
     }
 
     function keyupHandler(e) {
-        var input = e.data.msg;
+        var input = e.data.msg[0];
         if (e.keyCode == 27) {
             $.suggest.unreveal();
             return false; // true or false which is correct?
