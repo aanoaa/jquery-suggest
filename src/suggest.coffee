@@ -10,11 +10,13 @@ $.fn.extend
       $.data @, 'suggestions', data
       $.extend self.settings, settings if settings
       $this.on 'focus.suggest', ->
-        $(document).on 'keyup.suggest', { msg: @ }, self.keyup
+        $(document).on 'keyup.suggest'  , { msg: @ }, self.keyup
+        $(document).on 'keydown.suggest', { msg: @ }, self.keydown
 
       $this.on 'focusout.suggest', ->
         do $.suggest.clear
         $(document).off 'keyup.suggest'
+        $(document).off 'keydown.suggest'
 
 $.extend $.suggest = {},
   settings:
@@ -27,9 +29,12 @@ $.extend $.suggest = {},
       'z-index'    : 9999
   keyup: (e) ->
     $el = $(e.data.msg)
+    [TAB,ENTER,ESC,LEFT,UP,RIGHT,DOWN] = [9,13,27,37,38,39,40]
     switch e.keyCode
-      when 9,13 then console.log "#{e.keyCode}" # TAB, ENTER
-      when 27   then console.log "#{e.keyCode}" # ESC
+      when ENTER    then $.suggest.select($el.get(0))
+      when ESC      then do $.suggest.clear
+      when UP       then $.suggest.up()   if $.suggest.visible
+      when TAB,DOWN then $.suggest.down() if $.suggest.visible
       else
         list = $.data($el.get(0), 'suggestions')
         suggested = $.suggest.matching($el.get(0), list)
@@ -37,8 +42,29 @@ $.extend $.suggest = {},
           do $.suggest.clear
         else
           $.suggest.show($el.get(0), suggested)
+  keydown: (e) ->
+    [TAB] = [9]
+    switch e.keyCode
+      when TAB then e.preventDefault() if $.suggest.visible
+      else return
+  select: (el) ->
+    $(el).val $("#jquery-suggest li:eq(#{$.suggest.index - 1})").text()
+    do $.suggest.clear
+  up: ->
+    $.suggest.index-- if $.suggest.index > 1
+    $("#jquery-suggest li").css({ 'background-color': 'transparent' })
+      .eq($.suggest.index - 1)
+      .css({ 'background-color': 'LightBlue' })
+  down: ->
+    $.suggest.index++ if $.suggest.index < $.suggest.size
+    $("#jquery-suggest li").css({ 'background-color': 'transparent' })
+      .eq($.suggest.index - 1)
+      .css({ 'background-color': 'LightBlue' })
   clear: ->
     $('#jquery-suggest').each -> $(@).remove()
+    $.suggest.visible = false
+    $.suggest.index = 0
+    $.suggest.size = 0
   matching: (el, list) ->
     # firefox 에서는 한글입력에 대해서는 key* event 가 발생하지 않는다.
     re = new RegExp $(el).val()
@@ -65,3 +91,6 @@ $.extend $.suggest = {},
         .append($em)
         .append("#{item.slice(index + v.length)}").appendTo($ul)
     $('body').append($ul)
+    $.suggest.visible = true
+    $.suggest.index = 0
+    $.suggest.size = items.length

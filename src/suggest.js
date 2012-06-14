@@ -12,13 +12,17 @@
           $.extend(self.settings, settings);
         }
         $this.on('focus.suggest', function() {
-          return $(document).on('keyup.suggest', {
+          $(document).on('keyup.suggest', {
             msg: this
           }, self.keyup);
+          return $(document).on('keydown.suggest', {
+            msg: this
+          }, self.keydown);
         });
         return $this.on('focusout.suggest', function() {
           $.suggest.clear();
-          return $(document).off('keyup.suggest');
+          $(document).off('keyup.suggest');
+          return $(document).off('keydown.suggest');
         });
       });
     }
@@ -36,14 +40,25 @@
       }
     },
     keyup: function(e) {
-      var $el, list, suggested;
+      var $el, DOWN, ENTER, ESC, LEFT, RIGHT, TAB, UP, list, suggested, _ref;
       $el = $(e.data.msg);
+      _ref = [9, 13, 27, 37, 38, 39, 40], TAB = _ref[0], ENTER = _ref[1], ESC = _ref[2], LEFT = _ref[3], UP = _ref[4], RIGHT = _ref[5], DOWN = _ref[6];
       switch (e.keyCode) {
-        case 9:
-        case 13:
-          return console.log("" + e.keyCode);
-        case 27:
-          return console.log("" + e.keyCode);
+        case ENTER:
+          return $.suggest.select($el.get(0));
+        case ESC:
+          return $.suggest.clear();
+        case UP:
+          if ($.suggest.visible) {
+            return $.suggest.up();
+          }
+          break;
+        case TAB:
+        case DOWN:
+          if ($.suggest.visible) {
+            return $.suggest.down();
+          }
+          break;
         default:
           list = $.data($el.get(0), 'suggestions');
           suggested = $.suggest.matching($el.get(0), list);
@@ -54,10 +69,48 @@
           }
       }
     },
+    keydown: function(e) {
+      var TAB;
+      TAB = [9][0];
+      switch (e.keyCode) {
+        case TAB:
+          if ($.suggest.visible) {
+            return e.preventDefault();
+          }
+          break;
+      }
+    },
+    select: function(el) {
+      $(el).val($("#jquery-suggest li:eq(" + ($.suggest.index - 1) + ")").text());
+      return $.suggest.clear();
+    },
+    up: function() {
+      if ($.suggest.index > 1) {
+        $.suggest.index--;
+      }
+      return $("#jquery-suggest li").css({
+        'background-color': 'transparent'
+      }).eq($.suggest.index - 1).css({
+        'background-color': 'LightBlue'
+      });
+    },
+    down: function() {
+      if ($.suggest.index < $.suggest.size) {
+        $.suggest.index++;
+      }
+      return $("#jquery-suggest li").css({
+        'background-color': 'transparent'
+      }).eq($.suggest.index - 1).css({
+        'background-color': 'LightBlue'
+      });
+    },
     clear: function() {
-      return $('#jquery-suggest').each(function() {
+      $('#jquery-suggest').each(function() {
         return $(this).remove();
       });
+      $.suggest.visible = false;
+      $.suggest.index = 0;
+      return $.suggest.size = 0;
     },
     matching: function(el, list) {
       var re;
@@ -86,7 +139,10 @@
         });
         $("<li></li>").append("" + (item.slice(0, item.indexOf(v)))).append($em).append("" + (item.slice(index + v.length))).appendTo($ul);
       }
-      return $('body').append($ul);
+      $('body').append($ul);
+      $.suggest.visible = true;
+      $.suggest.index = 0;
+      return $.suggest.size = items.length;
     }
   });
 

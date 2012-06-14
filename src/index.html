@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="suggest.js"></script>
+    <script>
+  $(document).ready(function() {
+    var suggests = ['foo','bar','baz','서울아산병원','서울삼성병원'];
+    var settings = {};
+    $('#search').suggest(suggests, settings);
+    $('#other').suggest(['foo','bar','baz'], settings);
+  });
+    </script>
+  </head>
+  <body>
+    <input id="search" name="foo" type="text" />
+    <input id="other" name="foo" type="text" />
+  </body>
+</html>
