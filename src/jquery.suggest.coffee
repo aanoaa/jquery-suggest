@@ -21,11 +21,11 @@ $.fn.extend
 $.extend $.suggest = {},
   settings:
     css:
-      position          : 'absolute'
-      margin            : 0
-      padding           : '3px'
-      listStyleType     : 'none'
-      color             : '#555'
+      'position'        : 'absolute'
+      'margin'          : 0
+      'padding'         : '3px'
+      'listStyleType'   : 'none'
+      'color'           : '#555'
       'z-index'         : 999
       'background-color': '#fff'
       'border-color'    : '#555'
