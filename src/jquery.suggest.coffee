@@ -87,13 +87,18 @@ $.extend $.suggest = {},
     for item in items
       index = item.indexOf(v)
       $em = $("<em>#{v}</em>").css
-        color: '#000'
-        'font-style': 'normal'
+        'color'      : '#000'
+        'font-style' : 'normal'
         'font-weight': 'bold'
       list.push $("<li></li>")
         .append("#{item.slice(0, item.indexOf(v))}")
         .append($em)
-        .append("#{item.slice(index + v.length)}")#.appendTo($ul)
+        .append("#{item.slice(index + v.length)}")
+        .on('hover', ->
+          $el.val $(@).text()
+          $("#jquery-suggest li").css({ 'background-color': 'transparent' })
+          $(@).css { 'background-color': '#C0D9D9' }
+        )
       $ul.append(l) for l in list.sort (a, b) -> a.html().indexOf('<') - b.html().indexOf('<')
     $('body').append($ul)
     $.suggest.visible = true

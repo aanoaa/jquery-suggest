@@ -31,11 +31,11 @@
   $.extend($.suggest = {}, {
     settings: {
       css: {
-        position: 'absolute',
-        margin: 0,
-        padding: '3px',
-        listStyleType: 'none',
-        color: '#555',
+        'position': 'absolute',
+        'margin': 0,
+        'padding': '3px',
+        'listStyleType': 'none',
+        'color': '#555',
         'z-index': 999,
         'background-color': '#fff',
         'border-color': '#555',
@@ -92,20 +92,19 @@
       if ($.suggest.index > 1) {
         $.suggest.index--;
       }
-      return $("#jquery-suggest li").css({
-        'background-color': 'transparent'
-      }).eq($.suggest.index - 1).css({
-        'background-color': '#C0D9D9'
-      });
+      return $.suggest.highlight();
     },
     down: function() {
       if ($.suggest.index < $.suggest.size) {
         $.suggest.index++;
       }
+      return $.suggest.highlight();
+    },
+    highlight: function() {
       return $("#jquery-suggest li").css({
         'background-color': 'transparent'
       }).eq($.suggest.index - 1).css({
-        'background-color': 'LightBlue'
+        'background-color': '#C0D9D9'
       });
     },
     clear: function() {
@@ -118,7 +117,7 @@
     },
     matching: function(el, list) {
       var re;
-      re = new RegExp($(el).val());
+      re = new RegExp($(el).val().replace(/[-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"));
       return $.grep(list, function(word, i) {
         return re.test(word);
       });
@@ -137,11 +136,19 @@
         item = items[_i];
         index = item.indexOf(v);
         $em = $("<em>" + v + "</em>").css({
-          color: '#000',
+          'color': '#000',
           'font-style': 'normal',
           'font-weight': 'bold'
         });
-        list.push($("<li></li>").append("" + (item.slice(0, item.indexOf(v)))).append($em).append("" + (item.slice(index + v.length))));
+        list.push($("<li></li>").append("" + (item.slice(0, item.indexOf(v)))).append($em).append("" + (item.slice(index + v.length))).on('hover', function() {
+          $el.val($(this).text());
+          $("#jquery-suggest li").css({
+            'background-color': 'transparent'
+          });
+          return $(this).css({
+            'background-color': '#C0D9D9'
+          });
+        }));
         _ref1 = list.sort(function(a, b) {
           return a.html().indexOf('<') - b.html().indexOf('<');
         });
