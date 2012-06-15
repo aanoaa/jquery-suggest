@@ -33,11 +33,14 @@
       css: {
         position: 'absolute',
         margin: 0,
-        padding: '3px 0',
+        padding: '3px',
         listStyleType: 'none',
         color: '#555',
         'z-index': 999,
-        'background-color': '#fff'
+        'background-color': '#fff',
+        'border-color': '#555',
+        'border-style': 'solid',
+        'border-width': '1px'
       }
     },
     keyup: function(e) {
@@ -121,7 +124,7 @@
       });
     },
     show: function(el, items) {
-      var $el, $em, $ul, index, item, offset, v, _i, _len;
+      var $el, $em, $ul, index, item, l, list, offset, v, _i, _j, _len, _len1, _ref, _ref1;
       $.suggest.clear();
       $el = $(el);
       offset = $el.offset();
@@ -129,7 +132,7 @@
         top: offset.top + $el.height() + 7,
         left: offset.left
       }, $.suggest.settings.css));
-      v = $el.val();
+      _ref = [$el.val(), []], v = _ref[0], list = _ref[1];
       for (_i = 0, _len = items.length; _i < _len; _i++) {
         item = items[_i];
         index = item.indexOf(v);
@@ -138,7 +141,14 @@
           'font-style': 'normal',
           'font-weight': 'bold'
         });
-        $("<li></li>").append("" + (item.slice(0, item.indexOf(v)))).append($em).append("" + (item.slice(index + v.length))).appendTo($ul);
+        list.push($("<li></li>").append("" + (item.slice(0, item.indexOf(v)))).append($em).append("" + (item.slice(index + v.length))));
+        _ref1 = list.sort(function(a, b) {
+          return a.html().indexOf('<') - b.html().indexOf('<');
+        });
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          l = _ref1[_j];
+          $ul.append(l);
+        }
       }
       $('body').append($ul);
       $.suggest.visible = true;

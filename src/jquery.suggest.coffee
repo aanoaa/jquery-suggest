@@ -23,11 +23,14 @@ $.extend $.suggest = {},
     css:
       position          : 'absolute'
       margin            : 0
-      padding           : '3px 0'
+      padding           : '3px'
       listStyleType     : 'none'
       color             : '#555'
       'z-index'         : 999
       'background-color': '#fff'
+      'border-color'    : '#555'
+      'border-style'    : 'solid'
+      'border-width'    : '1px'
   keyup: (e) ->
     $el = $(e.data.msg)
     [TAB,ENTER,ESC,LEFT,UP,RIGHT,DOWN] = [9,13,27,37,38,39,40]
@@ -80,17 +83,18 @@ $.extend $.suggest = {},
         left: offset.left
       , $.suggest.settings.css
 
-    v = $el.val()
+    [v,list] = [$el.val(),[]]
     for item in items
       index = item.indexOf(v)
       $em = $("<em>#{v}</em>").css
         color: '#000'
         'font-style': 'normal'
         'font-weight': 'bold'
-      $("<li></li>")
+      list.push $("<li></li>")
         .append("#{item.slice(0, item.indexOf(v))}")
         .append($em)
-        .append("#{item.slice(index + v.length)}").appendTo($ul)
+        .append("#{item.slice(index + v.length)}")#.appendTo($ul)
+      $ul.append(l) for l in list.sort (a, b) -> a.html().indexOf('<') - b.html().indexOf('<')
     $('body').append($ul)
     $.suggest.visible = true
     $.suggest.index = 0
