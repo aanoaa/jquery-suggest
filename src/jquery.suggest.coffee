@@ -47,9 +47,9 @@ $.extend $.suggest = {},
         else
           $.suggest.show($el.get(0), suggested)
   keydown: (e) ->
-    [TAB] = [9]
+    [TAB,ENTER] = [9,13]
     switch e.keyCode
-      when TAB then e.preventDefault() if $.suggest.visible
+      when TAB,ENTER then e.preventDefault() if $.suggest.visible
       else return
   select: (el) ->
     $(el).val $("#jquery-suggest li:eq(#{if $.suggest.index isnt 0 then $.suggest.index - 1 else 0})").text()

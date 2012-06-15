@@ -74,10 +74,11 @@
       }
     },
     keydown: function(e) {
-      var TAB;
-      TAB = [9][0];
+      var ENTER, TAB, _ref;
+      _ref = [9, 13], TAB = _ref[0], ENTER = _ref[1];
       switch (e.keyCode) {
         case TAB:
+        case ENTER:
           if ($.suggest.visible) {
             return e.preventDefault();
           }
