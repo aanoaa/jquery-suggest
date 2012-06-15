@@ -56,14 +56,14 @@ $.extend $.suggest = {},
     do $.suggest.clear
   up: ->
     $.suggest.index-- if $.suggest.index > 1
+    $.suggest.highlight()
+  down: ->
+    $.suggest.index++ if $.suggest.index < $.suggest.size
+    $.suggest.highlight()
+  highlight: ->
     $("#jquery-suggest li").css({ 'background-color': 'transparent' })
       .eq($.suggest.index - 1)
       .css({ 'background-color': '#C0D9D9' })
-  down: ->
-    $.suggest.index++ if $.suggest.index < $.suggest.size
-    $("#jquery-suggest li").css({ 'background-color': 'transparent' })
-      .eq($.suggest.index - 1)
-      .css({ 'background-color': 'LightBlue' })
   clear: ->
     $('#jquery-suggest').each -> $(@).remove()
     $.suggest.visible = false
