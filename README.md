@@ -3,6 +3,11 @@ SYNOPSIS
 
     $('input').suggest(['January', 'February', 'March']);
 
+DEMO
+====
+
+[DEMO](http://aanoaa.github.com/jquery-suggest/)
+
 COPYRIGHT
 =========
 
