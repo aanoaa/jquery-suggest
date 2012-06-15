@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="src/jquery.suggest.js"></script>
+    <script>
+  $(document).ready(function() {
+    var settings = {};
+    $('#search').suggest(['ActionScript', 'AppleScript', 'Asp', 'BASIC', 'C', 'C++', 'Clojure', 'COBOL', 'ColdFusion', 'Erlang', 'Fortran', 'Groovy', 'Haskell', 'Java', 'JavaScript', 'Lisp', 'Perl', 'PHP', 'Python', 'Ruby', 'Scala', 'Small Talk', 'Scheme','서울아산병원','서울삼성병원'], settings);
+  });
+    </script>
+  </head>
+  <body>
+    <h1>jquery-suggest</h1>
+    <h2>Demo</h2>
+    <input id="search" name="foo" type="text" />
+    <p>(Start typing the name of a programming language…)</p>
+  </body>
+</html>
