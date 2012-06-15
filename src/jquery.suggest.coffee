@@ -71,7 +71,7 @@ $.extend $.suggest = {},
     $.suggest.size = 0
   matching: (el, list) ->
     # firefox 에서는 한글입력에 대해서는 key* event 가 발생하지 않는다.
-    re = new RegExp $(el).val()
+    re = new RegExp $(el).val().replace(/[-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
     $.grep list, (word, i) -> re.test(word)
   show: (el, items) ->
     do $.suggest.clear
