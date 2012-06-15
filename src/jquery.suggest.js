@@ -66,7 +66,7 @@
         default:
           list = $.data($el.get(0), 'suggestions');
           suggested = $.suggest.matching($el.get(0), list);
-          if (suggested.length === 0 || suggested.length === list.length) {
+          if (suggested.length === 0) {
             return $.suggest.clear();
           } else {
             return $.suggest.show($el.get(0), suggested);

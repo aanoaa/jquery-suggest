@@ -42,7 +42,7 @@ $.extend $.suggest = {},
       else
         list = $.data($el.get(0), 'suggestions')
         suggested = $.suggest.matching($el.get(0), list)
-        if suggested.length is 0 or suggested.length is list.length
+        if suggested.length is 0
           do $.suggest.clear
         else
           $.suggest.show($el.get(0), suggested)
