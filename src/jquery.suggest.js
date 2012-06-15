@@ -36,7 +36,8 @@
         padding: '3px 0',
         listStyleType: 'none',
         color: '#555',
-        'z-index': 9999
+        'z-index': 999,
+        'background-color': '#fff'
       }
     },
     keyup: function(e) {
@@ -91,7 +92,7 @@
       return $("#jquery-suggest li").css({
         'background-color': 'transparent'
       }).eq($.suggest.index - 1).css({
-        'background-color': 'LightBlue'
+        'background-color': '#C0D9D9'
       });
     },
     down: function() {

@@ -21,12 +21,13 @@ $.fn.extend
 $.extend $.suggest = {},
   settings:
     css:
-      position     : 'absolute'
-      margin       : 0
-      padding      : '3px 0'
-      listStyleType: 'none'
-      color        : '#555'
-      'z-index'    : 9999
+      position          : 'absolute'
+      margin            : 0
+      padding           : '3px 0'
+      listStyleType     : 'none'
+      color             : '#555'
+      'z-index'         : 999
+      'background-color': '#fff'
   keyup: (e) ->
     $el = $(e.data.msg)
     [TAB,ENTER,ESC,LEFT,UP,RIGHT,DOWN] = [9,13,27,37,38,39,40]
@@ -54,7 +55,7 @@ $.extend $.suggest = {},
     $.suggest.index-- if $.suggest.index > 1
     $("#jquery-suggest li").css({ 'background-color': 'transparent' })
       .eq($.suggest.index - 1)
-      .css({ 'background-color': 'LightBlue' })
+      .css({ 'background-color': '#C0D9D9' })
   down: ->
     $.suggest.index++ if $.suggest.index < $.suggest.size
     $("#jquery-suggest li").css({ 'background-color': 'transparent' })
