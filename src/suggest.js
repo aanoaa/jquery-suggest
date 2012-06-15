@@ -81,7 +81,7 @@
       }
     },
     select: function(el) {
-      $(el).val($("#jquery-suggest li:eq(" + ($.suggest.index - 1) + ")").text());
+      $(el).val($("#jquery-suggest li:eq(" + ($.suggest.index !== 0 ? $.suggest.index - 1 : 0) + ")").text());
       return $.suggest.clear();
     },
     up: function() {

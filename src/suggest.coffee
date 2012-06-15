@@ -48,7 +48,7 @@ $.extend $.suggest = {},
       when TAB then e.preventDefault() if $.suggest.visible
       else return
   select: (el) ->
-    $(el).val $("#jquery-suggest li:eq(#{$.suggest.index - 1})").text()
+    $(el).val $("#jquery-suggest li:eq(#{if $.suggest.index isnt 0 then $.suggest.index - 1 else 0})").text()
     do $.suggest.clear
   up: ->
     $.suggest.index-- if $.suggest.index > 1
